@@ -73,7 +73,7 @@ public class LlamadosActivity extends ActionBarActivity {
 
         if(llamados.isEmpty())
         {
-            db.addLLamado(new Llamado("1","SECTOR PUERTO", "Errazuris, Valparaiso","81 - 51 - 21", new Date()));
+            db.addLLamado(new Llamado("1","SECTOR PUERTO", "Errazuriz, Valparaiso","81 - 51 - 21", new Date()));
             db.addLLamado(new Llamado("1","SECTOR PUERTO", "Nueva York, Valparaiso","21", new Date()));
             db.addLLamado(new Llamado("2","SECTOR PUERTO", "Colon, Valparaiso","11", new Date()));
             db.addLLamado(new Llamado("3","SECTOR PUERTO", "Las Heras, Valparaiso","81 - 51 - 21", new Date()));
