@@ -25,6 +25,7 @@ public class LlamadosActivity extends ActionBarActivity {
     public final static String ID_EXTRA = "cl.gambadiez.llamadosdeemergencia._ID";
     private List<Llamado> llamados = new ArrayList<>();
     private ListView llamadosListview;
+    private MySQLiteHelper db = new MySQLiteHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +40,7 @@ public class LlamadosActivity extends ActionBarActivity {
                 startActivity(intent);
             }
         });
-        getLlamados();
-        updateLlamadosListView();
+        updateLlamadosList();
     }
 
     @Override
@@ -65,12 +65,25 @@ public class LlamadosActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void getLlamados()
+    private void updateLlamadosList()
     {
-        //TODO:: obtener llamados desde twitter
+        updateFromTwitter();
+        llamados = db.getAllLlamados();
+        //añadir llamado dummy si esta vacia la db
+        if(llamados.isEmpty())
+        {
+            db.addLLamado(new Llamado("1","SECTOR PUERTO", "Playa Ancha, Pacífico con Río Frío","81 - 51 - 21", new Date()));
+            llamados = db.getAllLlamados();
+        }
+
+        updateLlamadosListView();
+    }
+
+    private void updateFromTwitter()
+    {
+        //TODO:: obtener desde twetter
         //agregando llamados dummy
-        llamados.add(new Llamado("1","SECTOR PUERTO", "Playa Ancha, Pacífico con Río Frío","81 - 51 - 21", new Date()));
-        llamados.add(new Llamado("1","SECTOR PUERTO", "Playa Ancha, Pacífico con Río Fríoasj ndjhsa dasjaaa sadsdas aassd dhkash dasbldjas sdaldjas sdajldas asdkdnla dasldnl","81 - 51 - 21", new Date()));
+        //llamados.add(new Llamado("1","SECTOR PUERTO", "Playa Ancha, Pacífico con Río Frío","81 - 51 - 21", new Date()));
     }
 
     private void updateLlamadosListView()
