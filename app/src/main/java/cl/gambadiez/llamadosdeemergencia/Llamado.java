@@ -90,7 +90,7 @@ public class Llamado implements Parcelable {
         this.iconResourceID = iconResourceID;
     }
 
-    public void setIconResouceIDFromClave()
+    private void setIconResouceIDFromClave()
     {
         //TODO:: obtener el numero de la clave
         int numeroClave = 0;
