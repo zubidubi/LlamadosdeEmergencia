@@ -6,30 +6,30 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Llamados extends ActionBarActivity {
+public class MapaActivity extends ActionBarActivity {
 
+    private Llamado llamado;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_llamados);
-
-        timer = new Timer();
-        timer.scheduleAtFixedRate(timerTask, 0, 6000);
-
-
+        setContentView(R.layout.activity_mapa);
+        Intent intent = getIntent();
+        llamado = intent.getParcelableExtra(LlamadosActivity.ID_EXTRA);
+        TextView llamadoTextView = (TextView) findViewById(R.id.llamadoTextView);
+        llamadoTextView.setText("Clave: " + llamado.getClave() + "\n Sector: " + llamado.getSector() + "\n Direccion: " + llamado.getDireccion() + "\n Unidades: " + llamado.getUnidades());
     }
 
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_llamados, menu);
-
+        getMenuInflater().inflate(R.menu.menu_mapa, menu);
         return true;
     }
 
@@ -44,8 +44,7 @@ public class Llamados extends ActionBarActivity {
         if (id == R.id.action_settings) {
             return true;
         }
-
-        Intent myIntent  = new Intent(Llamados.this, Map.class);
+        Intent myIntent  = new Intent(this, Map.class);
         startActivity(myIntent);
         return super.onOptionsItemSelected(item);
     }
