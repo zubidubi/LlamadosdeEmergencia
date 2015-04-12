@@ -97,7 +97,7 @@ public class Llamado implements Parcelable {
         switch (numeroClave)
         {
             case 0:
-                this.iconResourceID = R.drawable.firewall;
+         //       this.iconResourceID = R.drawable.firewall;
                 break;
             //TODO:: hacer mas casos
         }

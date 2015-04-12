@@ -35,7 +35,7 @@ public class LlamadosActivity extends ActionBarActivity {
         llamadosListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Intent intent = new Intent(view.getContext(), MapaActivity.class);
+                Intent intent = new Intent(view.getContext(), Map.class);
                 intent.putExtra(ID_EXTRA, llamados.get(position));
                 startActivity(intent);
             }
@@ -70,9 +70,13 @@ public class LlamadosActivity extends ActionBarActivity {
         updateFromTwitter();
         llamados = db.getAllLlamados();
         //añadir llamado dummy si esta vacia la db
+
         if(llamados.isEmpty())
         {
-            db.addLLamado(new Llamado("1","SECTOR PUERTO", "Playa Ancha, Pacífico con Río Frío","81 - 51 - 21", new Date()));
+            db.addLLamado(new Llamado("1","SECTOR PUERTO", "Errazuris, Valparaiso","81 - 51 - 21", new Date()));
+            db.addLLamado(new Llamado("1","SECTOR PUERTO", "Nueva York, Valparaiso","21", new Date()));
+            db.addLLamado(new Llamado("2","SECTOR PUERTO", "Colon, Valparaiso","11", new Date()));
+            db.addLLamado(new Llamado("3","SECTOR PUERTO", "Las Heras, Valparaiso","51", new Date()));
             llamados = db.getAllLlamados();
         }
 

@@ -2,6 +2,7 @@ package cl.gambadiez.llamadosdeemergencia;
 
 import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
@@ -13,6 +14,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,13 +44,18 @@ import java.util.List;
 
 
 public class Map extends ActionBarActivity {
+
     public static GPSTracker gps;
 
     public static double latitude = 0;
     public static double longitude = 0;
+
+    private Llamado llamado;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent intent = getIntent();
+        llamado = intent.getParcelableExtra(LlamadosActivity.ID_EXTRA);
 
         gps = new GPSTracker(Map.this);
         // current location
@@ -72,6 +79,11 @@ public class Map extends ActionBarActivity {
         setContentView(R.layout.activity_map);
 
         setUpMapIfNeeded();
+
+/*
+         TextView llamadoTextView = (TextView) findViewById(R.id.textoEnMapa);
+        llamadoTextView.setText("Clave: " + llamado.getClave() + "\n Sector: " + llamado.getSector() + "\n Direccion: " + llamado.getDireccion() + "\n Unidades: " + llamado.getUnidades());
+*/
     }
     static public void DrawRuta(PolylineOptions rectLine)
     {
@@ -111,21 +123,7 @@ public class Map extends ActionBarActivity {
         setUpMapIfNeeded();
     }
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
-     * <p/>
-     * If it isn't installed {@link com.google.android.gms.maps.SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p/>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
-     */
+
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
@@ -162,15 +160,15 @@ public class Map extends ActionBarActivity {
         }
     };
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
+    //
+     // This is where we can add markers or lines, add listeners or move the camera. In this case, we
+     // just add a marker near Africa.
+     // <p/>
+     // This should only be called once and when we are sure that {@link #mMap} is not null.
+     //
     private void setUpMap() {
         //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-        buscar("Nueva York, Valparaíso, Chile");
+        buscar(llamado.getDireccion()+",Chile");
     }
 
     // Setting click event listener for the find button
@@ -240,7 +238,7 @@ public class Map extends ActionBarActivity {
 
         return data;
     }
-    /** A class, to download Places from Geocoding webservice */
+    // A class, to download Places from Geocoding webservice
     private class DownloadTask extends AsyncTask<String, Integer, String> {
 
         String data = null;
@@ -271,7 +269,7 @@ public class Map extends ActionBarActivity {
     }
 
     MarkerOptions currentLocation = new MarkerOptions();
-    /** A class to parse the Geocoding Places in non-ui thread */
+    // A class to parse the Geocoding Places in non-ui thread
     class ParserTask extends AsyncTask<String, Integer, List<HashMap<String,String>>>{
 
         JSONObject jObject;
@@ -286,7 +284,7 @@ public class Map extends ActionBarActivity {
             try{
                 jObject = new JSONObject(jsonData[0]);
 
-                /** Getting the parsed data as a an ArrayList */
+                // Getting the parsed data as a an ArrayList
                 places = parser.parse(jObject);
 
             }catch(Exception e){
@@ -393,30 +391,7 @@ public class Map extends ActionBarActivity {
 
 
         }
-        private void drawPrimaryLinePath(LatLng sourcePosition, LatLng destPosition)//ArrayList<LatLng> listLocsToDraw )
-        {
 
-            GMapV2Direction md;
-            md = new GMapV2Direction();
-            //mMap = ((SupportMapFragment) getSupportFragmentManager()
-            //      .findFragmentById(R.id.map)).getMap();
-
-            Log.d("documento", "a1");
-            Document doc = md.getDocument(sourcePosition, destPosition,
-                    GMapV2Direction.MODE_DRIVING);
-
-            Log.d("documento", "a2");
-            Log.d("documento", doc.getXmlEncoding());
-            Log.d("documento", "a3");
-            ArrayList<LatLng> directionPoint = md.getDirection(doc);/*
-        PolylineOptions rectLine = new PolylineOptions().width(3).color(
-                Color.RED);
-
-        for (int i = 0; i < directionPoint.size(); i++) {
-            rectLine.add(directionPoint.get(i));
-        }
-        Polyline polylin = mMap.addPolyline(rectLine);*/
-        }
 
 
 
