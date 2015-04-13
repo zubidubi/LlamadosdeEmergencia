@@ -1,24 +1,32 @@
 package cl.gambadiez.llamadosdeemergencia;
 
+import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
+import android.os.Debug;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONObject;
@@ -35,65 +43,37 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 
-public class MapaActivity extends ActionBarActivity {
+public class Map extends ActionBarActivity {
+
+    public GPSTracker gps;
+
+    public double latitude = 0;
+    public double longitude = 0;
 
     private Llamado llamado;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mapa);
+
+        Log.e("llamados","onCreate");
+        Log.d("documento", "xx1");
         Intent intent = getIntent();
+        Log.d("documento", "xx2");
         llamado = intent.getParcelableExtra(LlamadosActivity.ID_EXTRA);
-        TextView llamadoTextView = (TextView) findViewById(R.id.llamadoTextView);
-        llamadoTextView.setText("Clave: " + llamado.getClave() + "\n Sector: " + llamado.getSector() + "\n Direccion: " + llamado.getDireccion() + "\n Unidades: " + llamado.getUnidades());
-        onCreate2();
-    }
+        Log.d("documento", "xx3");
 
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_mapa, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-      /*  Intent myIntent  = new Intent(this, Map.class);
-        startActivity(myIntent);*/
-        return super.onOptionsItemSelected(item);
-    }
-
-   ///////////////////////////////////////////////////////////////////////////////////////////
-   public static GPSTracker gps;
-
-    public static double latitude = 0;
-    public static double longitude = 0;
-
-    protected void onCreate2() {
-
-        gps = new GPSTracker(MapaActivity.this);
+        gps = new GPSTracker(Map.this);
         // current location
-
+        Log.d("documento", "xx4");
 
         // check if GPS enabled
-        if(MapaActivity.gps.canGetLocation()){
+        if(gps.canGetLocation()){
+            latitude = gps.getLatitude();
+            longitude = gps.getLongitude();
 
-            latitude = MapaActivity.gps.getLatitude();
-            longitude = MapaActivity.gps.getLongitude();
+            Log.e("llamados", "xx5 gps latitude: " + String.valueOf(latitude) + " longitude " + String.valueOf(longitude));
 
             // \n is for new line
             Toast.makeText(getApplicationContext(), "Your Location is - \nLat: " + latitude + "\nLong: " + longitude, Toast.LENGTH_LONG).show();
@@ -101,27 +81,33 @@ public class MapaActivity extends ActionBarActivity {
             // can't get location
             // GPS or Network is not enabled
             // Ask user to enable GPS/network in settings
-            MapaActivity.gps.showSettingsAlert();
+            gps.showSettingsAlert();
         }
 
         setContentView(R.layout.activity_map);
 
         setUpMapIfNeeded();
-    }
+        Log.d("documento", "xx6");
+/*
+         TextView llamadoTextView = (TextView) findViewById(R.id.textoEnMapa);
+        llamadoTextView.setText("Clave: " + llamado.getClave() + "\n Sector: " + llamado.getSector() + "\n Direccion: " + llamado.getDireccion() + "\n Unidades: " + llamado.getUnidades());
+*/
 
-    static public void DrawRuta(PolylineOptions rectLine)
+        buscar(llamado.getDireccion()+",Chile");
+    }
+    public void DrawRuta(PolylineOptions rectLine)
     {
 
         mMap.addPolyline(rectLine);
     }
-/*
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_map, menu);
         return true;
-    }*/
-/*
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -136,8 +122,8 @@ public class MapaActivity extends ActionBarActivity {
 
         return super.onOptionsItemSelected(item);
     }
-*/
-    private static GoogleMap mMap; // Might be null if Google Play services APK is not available.
+
+    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
 
 
@@ -147,31 +133,20 @@ public class MapaActivity extends ActionBarActivity {
         setUpMapIfNeeded();
     }
 
-    /**
-     * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-     * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
-     * <p/>
-     * If it isn't installed {@link com.google.android.gms.maps.SupportMapFragment} (and
-     * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-     * install/update the Google Play services APK on their device.
-     * <p/>
-     * A user can return to this FragmentActivity after following the prompt and correctly
-     * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-     * have been completely destroyed during this process (it is likely that it would only be
-     * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-     * method in {@link #onResume()} to guarantee that it will be called.
-     */
+
     private void setUpMapIfNeeded() {
         // Do a null check to confirm that we have not already instantiated the map.
+
+        Log.e("llamados", "SETUPMAP 00");
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
             //mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-            //     .getMap();
-
+               //     .getMap();
+            Log.e("llamados", "SETUPMAP 11");
             mMap  = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
             // Check if we were successful in obtaining the map.
             if (mMap != null) {
+                Log.e("llamados", "SETUPMAP 22");
                 setUpMap();
             }
         }
@@ -198,15 +173,14 @@ public class MapaActivity extends ActionBarActivity {
         }
     };
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
+    //
+     // This is where we can add markers or lines, add listeners or move the camera. In this case, we
+     // just add a marker near Africa.
+     // <p/>
+     // This should only be called once and when we are sure that {@link #mMap} is not null.
+     //
     private void setUpMap() {
         //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
-        buscar(llamado.getDireccion()+",Chile");
     }
 
     // Setting click event listener for the find button
@@ -235,6 +209,7 @@ public class MapaActivity extends ActionBarActivity {
 
         // Instantiating DownloadTask to get places from Google Geocoding service
         // in a non-ui thread
+        Log.e("llamados", "BUSCANDO NUEVA POSICION");
         DownloadTask downloadTask = new DownloadTask();
 
         // Start downloading the geocoding places
@@ -276,7 +251,7 @@ public class MapaActivity extends ActionBarActivity {
 
         return data;
     }
-    /** A class, to download Places from Geocoding webservice */
+    // A class, to download Places from Geocoding webservice
     private class DownloadTask extends AsyncTask<String, Integer, String> {
 
         String data = null;
@@ -289,6 +264,8 @@ public class MapaActivity extends ActionBarActivity {
             }catch(Exception e){
                 Log.d("Background Task", e.toString());
             }
+
+            Log.e("llamados", "BUSCANDO NUEVA POSICION 22");
             return data;
         }
 
@@ -302,12 +279,14 @@ public class MapaActivity extends ActionBarActivity {
 
             // Start parsing the places in JSON format
             // Invokes the "doInBackground()" method of the class ParseTask
+            Log.e("llamados", "BUSCANDO NUEVA POSICION 33");
             parserTask.execute(result);
+
         }
     }
 
     MarkerOptions currentLocation = new MarkerOptions();
-    /** A class to parse the Geocoding Places in non-ui thread */
+    // A class to parse the Geocoding Places in non-ui thread
     class ParserTask extends AsyncTask<String, Integer, List<HashMap<String,String>>>{
 
         JSONObject jObject;
@@ -322,12 +301,13 @@ public class MapaActivity extends ActionBarActivity {
             try{
                 jObject = new JSONObject(jsonData[0]);
 
-                /** Getting the parsed data as a an ArrayList */
+                // Getting the parsed data as a an ArrayList
                 places = parser.parse(jObject);
 
             }catch(Exception e){
                 Log.d("Exception",e.toString());
             }
+            Log.e("llamados", "BUSCANDO NUEVA POSICION 44");
             return places;
         }
         GPSTracker gps;
@@ -335,6 +315,7 @@ public class MapaActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(List<HashMap<String,String>> list){
 
+            Log.e("llamados", "BUSCANDO NUEVA POSICION 55");
             // Clears all the existing markers
             mMap.clear();
 
@@ -356,12 +337,12 @@ public class MapaActivity extends ActionBarActivity {
                 String name = hmPlace.get("formatted_address");
 
                 LatLng latLng = new LatLng(lat, lng);
-
+                Log.e("llamados", "ZZZZ: " + String.valueOf(latLng.latitude) + " " + String.valueOf(latLng.longitude));
                 // Setting the position for the marker
                 markerOptions.position(latLng);
 
                 // Setting the title for the marker
-                markerOptions.title(name);
+                markerOptions.title(name).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
 
                 // Placing a marker on the touched position
                 mMap.addMarker(markerOptions);
@@ -371,15 +352,15 @@ public class MapaActivity extends ActionBarActivity {
 
 
 
-                LatLng ll = new LatLng(MapaActivity.latitude, MapaActivity.longitude);
+                LatLng ll = new LatLng(latitude, longitude);
                 currentLocation.position(ll);
-                Log.e("llamados", String.valueOf(MapaActivity.latitude));
                 // Setting the title for the marker
-                currentLocation.title("Estás aquí");
+/*                currentLocation.title("Estás aquí");
+                currentLocation.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).alpha(0.3f);
 
                 // Placing a marker on the touched position
                 mMap.addMarker(currentLocation);
-
+*/
 
                 RetrieveFeedTask executer = new RetrieveFeedTask();
                 executer.execute(ll, latLng);
@@ -390,6 +371,7 @@ public class MapaActivity extends ActionBarActivity {
                     CameraPosition cp = new CameraPosition.Builder().target(latLng).zoom(14).build();
                     //mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
                     mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cp));
+                    Log.e("llamados", "MOVIENDO CAMARA A POS: " + String.valueOf(latLng.latitude));
                 }
             }
         }
@@ -398,7 +380,7 @@ public class MapaActivity extends ActionBarActivity {
             GMapV2Direction md;
             @Override
             protected void onPostExecute(PolylineOptions result) {
-                MapaActivity.DrawRuta(result);
+                DrawRuta(result);
             }
             @Override
             protected PolylineOptions doInBackground(LatLng... latLngs) {
@@ -415,44 +397,21 @@ public class MapaActivity extends ActionBarActivity {
                 Log.d("documento", "a3");
 
                 ArrayList<LatLng> directionPoint = md.getDirection(doc);
-                PolylineOptions rectLine = new PolylineOptions().width(3).color(
-                        Color.RED);
-                Log.d("documento", "a4");
-                for (int i = 0; i < directionPoint.size(); i++) {
-                    rectLine.add(directionPoint.get(i));
-                }
+            PolylineOptions rectLine = new PolylineOptions().width(3).color(
+                    Color.RED);
+            Log.d("documento", "a4");
+            for (int i = 0; i < directionPoint.size(); i++) {
+                rectLine.add(directionPoint.get(i));
+            }//31:54.199
 
-                //mMap.addPolyline(rectLine);
+            //mMap.addPolyline(rectLine);
                 //Map.DrawRuta(rectLine);
                 return rectLine;
             }
 
 
         }
-        private void drawPrimaryLinePath(LatLng sourcePosition, LatLng destPosition)//ArrayList<LatLng> listLocsToDraw )
-        {
 
-            GMapV2Direction md;
-            md = new GMapV2Direction();
-            //mMap = ((SupportMapFragment) getSupportFragmentManager()
-            //      .findFragmentById(R.id.map)).getMap();
-
-            Log.d("documento", "a1");
-            Document doc = md.getDocument(sourcePosition, destPosition,
-                    GMapV2Direction.MODE_DRIVING);
-
-            Log.d("documento", "a2");
-            Log.d("documento", doc.getXmlEncoding());
-            Log.d("documento", "a3");
-            ArrayList<LatLng> directionPoint = md.getDirection(doc);/*
-        PolylineOptions rectLine = new PolylineOptions().width(3).color(
-                Color.RED);
-
-        for (int i = 0; i < directionPoint.size(); i++) {
-            rectLine.add(directionPoint.get(i));
-        }
-        Polyline polylin = mMap.addPolyline(rectLine);*/
-        }
 
 
 

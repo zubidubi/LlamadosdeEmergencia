@@ -6,12 +6,16 @@ import android.os.Parcelable;
 import java.util.Date;
 
 public class Llamado implements Parcelable {
+    private int ID;
     private String clave;
     private String sector;
     private String direccion;
     private String unidades;
     private Date date;
     private int iconResourceID;
+
+    public Llamado()
+    {}
 
     public Llamado (String clave, String sector, String direccion, String unidades, Date date)
     {
@@ -24,13 +28,30 @@ public class Llamado implements Parcelable {
         setIconResouceIDFromClave();
     }
 
+    public int getID() {
+        return ID;
+    }
+
+    public void setID(int ID) {
+        this.ID = ID;
+    }
+
     public String getClave()
     {
         return clave;
     }
+
+    public void  setClave(String clave) {
+        this.clave = clave;
+    }
+
     public String getSector()
     {
         return sector;
+    }
+
+    public void setSector(String sector) {
+        this.sector = sector;
     }
 
     public String getDireccion()
@@ -38,9 +59,17 @@ public class Llamado implements Parcelable {
         return direccion;
     }
 
+    public void setDireccion(String direccion) {
+        this.direccion = direccion;
+    }
+
     public String getUnidades()
     {
         return  unidades;
+    }
+
+    public void setUnidades(String unidades) {
+        this.unidades = unidades;
     }
 
     public Date getDate()
@@ -48,12 +77,20 @@ public class Llamado implements Parcelable {
         return date;
     }
 
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     public int getIconResourceID()
     {
         return iconResourceID;
     }
 
-    public void setIconResouceIDFromClave()
+    public void setIconResourceID(int iconResourceID) {
+        this.iconResourceID = iconResourceID;
+    }
+
+    private void setIconResouceIDFromClave()
     {
         //TODO:: obtener el numero de la clave
         int numeroClave = 0;
@@ -73,6 +110,7 @@ public class Llamado implements Parcelable {
 
     // write your object's data to the passed-in Parcel
     public void writeToParcel(Parcel out, int flags) {
+        out.writeInt(ID);
         out.writeString(clave);
         out.writeString(sector);
         out.writeString(direccion);
@@ -94,11 +132,18 @@ public class Llamado implements Parcelable {
 
     // example constructor that takes a Parcel and gives you an object populated with it's values
     private Llamado(Parcel in) {
+        ID = in.readInt();
         clave = in.readString();
         sector = in.readString();
         direccion = in.readString();
         unidades = in.readString();
         date = new Date(in.readLong());
         iconResourceID = in.readInt();
+    }
+
+    @Override
+    public String toString() {
+        return "LLamado [id=" + ID + ", clave=" + clave + ", sector=" + sector + ", direccion=" + direccion + ", unidades=" + unidades + ", date=" + date.getTime()
+                + ", iconResourceID=" + iconResourceID + "]";
     }
 }
