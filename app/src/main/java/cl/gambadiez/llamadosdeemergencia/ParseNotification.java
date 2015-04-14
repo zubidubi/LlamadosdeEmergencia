@@ -22,7 +22,6 @@ import com.parse.SaveCallback;
         // Add your initialization code here App ID -- Client Key
         Parse.enableLocalDatastore(this);
         Parse.initialize(this, "r20i16dy7yI4xph20fI2mqYlRDtPoOa5uccl0NUt", "dAiO5yi94O0Sl6EiHCaKxH27yVJBYyM3nTDQhm81");
-
         ParsePush.subscribeInBackground("", new SaveCallback() {
             @Override
             public void done(ParseException e) {
@@ -33,5 +32,6 @@ import com.parse.SaveCallback;
                 }
             }
         });
+
     }
 }

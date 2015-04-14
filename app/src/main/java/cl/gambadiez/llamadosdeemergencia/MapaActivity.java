@@ -21,6 +21,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
 
@@ -47,6 +48,23 @@ public class MapaActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_mapa);
         Intent intent = getIntent();
+
+        //Obtendo el mensaje de la notification
+        Bundle extras = intent.getExtras();
+        String jsonMessage = extras != null ? extras.getString("com.parse.Data") : "";
+        String message = "";
+        JSONObject jObject;
+        try {
+            if (jsonMessage != null && !jsonMessage.equals("")) {
+                jObject = new JSONObject(jsonMessage);
+                message = jObject.getString("alert");
+            }
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+        Log.d("PUSH", "Mensaje = " + message);
+
         llamado = intent.getParcelableExtra(LlamadosActivity.ID_EXTRA);
         TextView llamadoTextView = (TextView) findViewById(R.id.llamadoTextView);
         llamadoTextView.setText("Clave: " + llamado.getClave() + "\n Sector: " + llamado.getSector() + "\n Direccion: " + llamado.getDireccion() + "\n Unidades: " + llamado.getUnidades());
