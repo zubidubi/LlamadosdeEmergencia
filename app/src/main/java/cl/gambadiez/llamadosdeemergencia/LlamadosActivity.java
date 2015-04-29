@@ -3,6 +3,7 @@ package cl.gambadiez.llamadosdeemergencia;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -12,6 +13,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
@@ -30,6 +34,33 @@ public class LlamadosActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Intent i = getIntent();
+        //Obtendo el mensaje de la notification
+        Bundle extras = i.getExtras();
+        String jsonMessage = extras != null ? extras.getString("com.parse.Data") : "";
+        String message = "";
+        JSONObject jObject;
+        try {
+            if (jsonMessage != null && !jsonMessage.equals("")) {
+                jObject = new JSONObject(jsonMessage);
+                message = jObject.getString("alert");
+
+                Log.d("PUSH", "Mensaje = " + message);
+                String[] splittedMsg = message.split("::");
+                Llamado llamadoNot = new Llamado(splittedMsg[0], splittedMsg[1], splittedMsg[2], splittedMsg[3], new Date() );
+                db.addLLamado(llamadoNot);
+                Intent intent = new Intent(this.getBaseContext(), Map.class);
+                intent.putExtra(ID_EXTRA, llamadoNot);
+                startActivity(intent);
+            }
+        }
+        catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        //"Clave 1::SECTOR PUERTO::Errazuriz, Valparaiso::81 - 51 - 21";
+
+
         setContentView(R.layout.activity_llamados);
         llamadosListview = (ListView) findViewById(R.id.llamadosListView);
         llamadosListview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -73,10 +104,10 @@ public class LlamadosActivity extends ActionBarActivity {
 
         if(llamados.isEmpty())
         {
-            db.addLLamado(new Llamado("1","SECTOR PUERTO", "Errazuriz, Valparaiso","81 - 51 - 21", new Date()));
-            db.addLLamado(new Llamado("1","SECTOR PUERTO", "Nueva York, Valparaiso","21", new Date()));
-            db.addLLamado(new Llamado("2","SECTOR PUERTO", "Colon, Valparaiso","11", new Date()));
-            db.addLLamado(new Llamado("3","SECTOR PUERTO", "Las Heras, Valparaiso","81 - 51 - 21", new Date()));
+            db.addLLamado(new Llamado("Clave 1","SECTOR PUERTO", "Errazuriz, Valparaiso","81 - 51 - 21", new Date()));
+            db.addLLamado(new Llamado("Clave 1","SECTOR PUERTO", "Nueva York, Valparaiso","21", new Date()));
+            db.addLLamado(new Llamado("Clave 2","SECTOR PUERTO", "Colon, Valparaiso","11", new Date()));
+            db.addLLamado(new Llamado("Clave 5-1","SECTOR PUERTO", "Las Heras, Valparaiso","81 - 51 - 21", new Date()));
             llamados = db.getAllLlamados();
         }
 
@@ -118,7 +149,7 @@ public class LlamadosActivity extends ActionBarActivity {
 
             //set llamado
             TextView llamadoTextView = (TextView) itemView.findViewById(R.id.claveTextView);
-            llamadoTextView.setText("Clave " + currentLlamado.getClave());
+            llamadoTextView.setText(currentLlamado.getClave());
 
             //set descripcion
             TextView descripcionTextView = (TextView) itemView.findViewById(R.id.descripcionTextView);

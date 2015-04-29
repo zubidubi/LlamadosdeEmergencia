@@ -2,6 +2,7 @@ package cl.gambadiez.llamadosdeemergencia;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.Date;
 
@@ -93,13 +94,32 @@ public class Llamado implements Parcelable {
     private void setIconResouceIDFromClave()
     {
         //TODO:: obtener el numero de la clave
-        int numeroClave = 0;
-        switch (numeroClave)
+        //int numeroClave = 0;
+        String clave = this.getClave();
+        Log.d("gamborimbos", clave);
+
+
+        if(clave.contains("Clave 1")) {
+            this.iconResourceID = R.drawable.c1;
+        }
+        if(clave.contains("Clave 2")) {
+            this.iconResourceID = R.drawable.c2;
+
+        }
+        if(clave.contains("Clave 4") || clave.contains("Clave 4-1") || clave.contains("Clave 4-2")) {
+            this.iconResourceID = R.drawable.c4;
+
+        }
+        if(clave.contains("Clave 5") || clave.contains("Clave 5-1") || clave.contains("Clave 5-2")) {
+            this.iconResourceID = R.drawable.c5;
+        }
+        if(clave.contains("Clave 15")) {
+            this.iconResourceID = R.drawable.c15;
+        }
+
+        else
         {
-            case 0:
-                this.iconResourceID = R.drawable.firewall;
-                break;
-            //TODO:: hacer mas casos
+            this.iconResourceID = R.drawable.firewall;
         }
     }
 

@@ -49,21 +49,7 @@ public class MapaActivity extends ActionBarActivity {
         setContentView(R.layout.activity_mapa);
         Intent intent = getIntent();
 
-        //Obtendo el mensaje de la notification
-        Bundle extras = intent.getExtras();
-        String jsonMessage = extras != null ? extras.getString("com.parse.Data") : "";
-        String message = "";
-        JSONObject jObject;
-        try {
-            if (jsonMessage != null && !jsonMessage.equals("")) {
-                jObject = new JSONObject(jsonMessage);
-                message = jObject.getString("alert");
-            }
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Log.d("PUSH", "Mensaje = " + message);
+
 
         llamado = intent.getParcelableExtra(LlamadosActivity.ID_EXTRA);
         TextView llamadoTextView = (TextView) findViewById(R.id.llamadoTextView);
