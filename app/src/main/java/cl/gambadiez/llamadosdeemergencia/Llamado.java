@@ -96,24 +96,24 @@ public class Llamado implements Parcelable {
         //TODO:: obtener el numero de la clave
         //int numeroClave = 0;
         String clave = this.getClave();
-        Log.d("gamborimbos", clave);
+        Log.d("gamborimbos", "hola"+ clave);
 
 
-        if(clave.contains("Clave 1")) {
+        if(clave.equals("Clave 1")) {
             this.iconResourceID = R.drawable.c1;
         }
-        if(clave.contains("Clave 2")) {
+        if(clave.equals("Clave 2")) {
             this.iconResourceID = R.drawable.c2;
 
         }
-        if(clave.contains("Clave 4") || clave.contains("Clave 4-1") || clave.contains("Clave 4-2")) {
+        if(clave.equals("Clave 4") || clave.equals("Clave 4-1") || clave.equals("Clave 4-2")) {
             this.iconResourceID = R.drawable.c4;
 
         }
-        if(clave.contains("Clave 5") || clave.contains("Clave 5-1") || clave.contains("Clave 5-2")) {
+        if(clave.equals("Clave 5") || clave.equals("Clave 5-1") || clave.equals("Clave 5-2")) {
             this.iconResourceID = R.drawable.c5;
         }
-        if(clave.contains("Clave 15")) {
+        if(clave.equals("Clave 15")) {
             this.iconResourceID = R.drawable.c15;
         }
 

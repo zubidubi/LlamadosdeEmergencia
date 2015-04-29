@@ -20,6 +20,8 @@ import org.json.JSONObject;
 import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -99,17 +101,21 @@ public class LlamadosActivity extends ActionBarActivity {
     private void updateLlamadosList()
     {
         updateFromTwitter();
+
         llamados = db.getAllLlamados();
         //añadir llamado dummy si esta vacia la db
-
-        if(llamados.isEmpty())
+        for(Llamado ll : llamados)
+        {
+            db.deleteLlamado(ll);
+        }
+        /*if(llamados.isEmpty())
         {
             db.addLLamado(new Llamado("Clave 1","SECTOR PUERTO", "Errazuriz, Valparaiso","81 - 51 - 21", new Date()));
             db.addLLamado(new Llamado("Clave 1","SECTOR PUERTO", "Nueva York, Valparaiso","21", new Date()));
             db.addLLamado(new Llamado("Clave 2","SECTOR PUERTO", "Colon, Valparaiso","11", new Date()));
             db.addLLamado(new Llamado("Clave 5-1","SECTOR PUERTO", "Las Heras, Valparaiso","81 - 51 - 21", new Date()));
             llamados = db.getAllLlamados();
-        }
+        }*/
 
         updateLlamadosListView();
     }
